@@ -106,6 +106,29 @@ input[type="button"]:active {
 #empezarEntrenamiento:hover {
   opacity: 0.88;
 }
+input[type="submit"] {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  background-color: #e8ff47;
+  color: #0f0f0f;
+  margin-top: 0.25rem;
+}
+
+input[type="submit"]:active {
+  transform: scale(0.98);
+}
+
+input[type="submit"]:hover {
+  opacity: 0.88;
+}
 
 @media (max-width: 480px) {
   form {

@@ -100,7 +100,7 @@ input[type="number"]::-webkit-outer-spin-button {
   gap: 1rem;
 }
 
-#parrafoEjercicios {
+#contadorEjercicios {
   font-size: 0.9rem;
   color: #777;
   letter-spacing: 0.03em;
