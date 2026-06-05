@@ -23,3 +23,9 @@ formularioIndex.addEventListener("submit", function(event){
     })
     //Y redirige a entrenamiento.html
 })
+const botonInforme = document.getElementById("generarInforme")
+
+botonInforme.addEventListener("click", function() {
+    const nombre = document.getElementById("nombreUsuario").value.toLowerCase().trim().replace(/\s+/g, "")
+    window.location.href = "/informe/" + nombre
+})

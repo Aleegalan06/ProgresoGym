@@ -2,6 +2,7 @@ const express = require("express")
 const path = require("path")
 const fs = require("fs")
 const initSqlJs = require("sql.js")
+const XLSX = require("xlsx")
 
 const app = express()
 const PORT = 3000
@@ -79,6 +80,58 @@ async function iniciarServidor() {
         const idEntrenamiento = resultId[0].values[0][0]
 
         res.json({ idEntrenamiento: idEntrenamiento })
+    })
+    app.post("/ejercicio", (req, res) => {
+        const {nombre, peso, series, repeticiones, idEntrenamiento } = req.body
+        db.run("INSERT INTO ejercicios (nombre, peso, series, repeticiones, id_entrenamiento) VALUES (?, ?, ?, ?, ?)",
+            [nombre, peso, series, repeticiones, idEntrenamiento])
+            guardarDB()
+        res.json({ mensaje: "Recibido" })
+    })
+    app.get("/informe/:nombre", (req, res) => {
+        const nombre = req.params.nombre
+        
+        const entrenamientos = db.exec(
+            "SELECT id, fecha FROM entrenamientos WHERE id_usuario = (SELECT id FROM usuarios WHERE nombre = ?)",
+            [nombre]
+        )
+    
+        if(!entrenamientos.length || !entrenamientos[0].values.length) {
+            return res.json({ error: "No hay entrenamientos" })
+        }
+    
+        const wb = XLSX.utils.book_new()
+        const filas = []
+    
+        entrenamientos[0].values.forEach(entrenamiento => {
+            const idEntrenamiento = entrenamiento[0]
+            const fecha = entrenamiento[1]
+        
+            filas.push(["ENTRENAMIENTO : " + fecha, "", "", ""])
+            filas.push(["Ejercicio", "Peso", "Series", "Repeticiones"])
+        
+            const ejercicios = db.exec(
+                "SELECT nombre, peso, series, repeticiones FROM ejercicios WHERE id_entrenamiento = ?",
+                [idEntrenamiento]
+            )
+        
+            if(ejercicios.length && ejercicios[0].values.length) {
+                ejercicios[0].values.forEach(ej => {
+                    filas.push([ej[0], ej[1], ej[2], ej[3]])
+                })
+            }
+        
+            filas.push(["", "", "", ""])
+        })
+    
+        const ws = XLSX.utils.aoa_to_sheet(filas)
+        XLSX.utils.book_append_sheet(wb, ws, "Informe")
+    
+        const buffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" })
+    
+        res.setHeader("Content-Disposition", "attachment; filename=informe.xlsx")
+        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        res.send(buffer)
     })
 
     app.listen(PORT, () => {
