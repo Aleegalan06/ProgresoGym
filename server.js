@@ -56,7 +56,6 @@ async function iniciarServidor() {
     
     app.post("/usuario", (req, res) => {
         const nombre = req.body.nombre.replace(/\s+/g, "")
-
         try {
             db.run("INSERT OR IGNORE INTO usuarios (nombre) VALUES (?)", [nombre])
             guardarDB()
@@ -65,19 +64,27 @@ async function iniciarServidor() {
             res.json({ error: "Error al guardar el usuario" })
         }
     })
+
     app.post("/entrenamiento", (req, res) => {
         const { nombre, fecha } = req.body
         const resultado = db.exec("SELECT id FROM usuarios WHERE nombre = ?", [nombre])
         const idUsuario = resultado[0].values[0][0]
-        db.run("INSERT INTO entrenamientos (fecha, id_usuario) VALUES (?, ?)", [fecha, idUsuario])
+
+        const stmt = db.prepare("INSERT INTO entrenamientos (fecha, id_usuario) VALUES (?, ?)")
+        stmt.run([fecha, idUsuario])
+        stmt.free()
         guardarDB()
 
-        const idEntrenamiento = db.exec("SELECT last_insert_rowid()")[0].values[0][0]
-        res.json({ idEntrenamiento: idEntrenamiento})
+        const resultId = db.exec("SELECT MAX(id) FROM entrenamientos")
+        const idEntrenamiento = resultId[0].values[0][0]
+
+        res.json({ idEntrenamiento: idEntrenamiento })
     })
+
     app.listen(PORT, () => {
         console.log("Servidor corriendo en http://localhost:3000")
     })
+    
 }
 
 iniciarServidor()
