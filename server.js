@@ -39,15 +39,18 @@ async function iniciarServidor() {
         CREATE TABLE IF NOT EXISTS entrenamientos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             fecha TEXT NOT NULL,
+            estado TEXT DEFAULT 'PENDIENTE',
             id_usuario INTEGER NOT NULL,
             FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
         );
+
         CREATE TABLE IF NOT EXISTS ejercicios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
             peso TEXT,
             series INTEGER,
             repeticiones INTEGER,
+            completado INTEGER DEFAULT 0,
             id_entrenamiento INTEGER NOT NULL,
             FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id)
         );

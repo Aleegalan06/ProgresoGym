@@ -29,3 +29,13 @@ botonInforme.addEventListener("click", function() {
     const nombre = document.getElementById("nombreUsuario").value.toLowerCase().trim().replace(/\s+/g, "")
     window.location.href = "/informe/" + nombre
 })
+//Listado de entrenamientos
+const verListado = document.getElementById("verListado")
+
+nombreUsuario.addEventListener("input", function(){
+    if(nombreUsuario.value.trim() != ""){
+        verListado.disabled = false
+    } else {
+        verListado.disabled = true
+    }
+})
