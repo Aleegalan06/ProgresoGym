@@ -136,6 +136,45 @@ async function iniciarServidor() {
         res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         res.send(buffer)
     })
+    app.get("/listado/:nombre", (req, res) => {
+        const nombre = req.params.nombre
+        const resultado = db.exec(
+            "SELECT id, fecha, estado FROM entrenamientos WHERE id_usuario = (SELECT id FROM usuarios WHERE nombre = ?)",
+            [nombre]
+        )
+        if(!resultado.length || !resultado[0].values.length){
+            return res.json([])
+        }
+        const entrenamientos = resultado[0].values.map(e => ({
+            id: e[0],
+            fecha: e[1],
+            estado: e[2]
+        }))
+        res.json(entrenamientos)
+    })
+    app.get("/detalle/:id", (req, res) => {
+        const id = req.params.id
+        
+        const resultado = db.exec(
+            "SELECT id, nombre, peso, series, repeticiones, completado FROM ejercicios WHERE id_entrenamiento = ?",
+            [id]
+        )
+    
+        if(!resultado.length || !resultado[0].values.length) {
+            return res.json([])
+        }
+    
+        const ejercicios = resultado[0].values.map(e => ({
+            id: e[0],
+            nombre: e[1],
+            peso: e[2],
+            series: e[3],
+            repeticiones: e[4],
+            completado: e[5]
+        }))
+    
+        res.json(ejercicios)
+    })
 
     app.listen(PORT, () => {
         console.log("Servidor corriendo en http://localhost:3000")
