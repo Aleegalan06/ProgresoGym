@@ -39,3 +39,9 @@ nombreUsuario.addEventListener("input", function(){
         verListado.disabled = true
     }
 })
+
+verListado.addEventListener("click", function(){
+    const nombre = nombreUsuario.value.toLowerCase().trim().replace(/\s+/g, "")
+    localStorage.setItem("usuario", nombre)
+    window.location.href = "../html/listado.html"
+})
