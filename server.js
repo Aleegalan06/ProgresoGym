@@ -175,6 +175,27 @@ async function iniciarServidor() {
     
         res.json(ejercicios)
     })
+    app.post("/ejercicio/completado", (req, res) => {
+    const { id, completado, idEntrenamiento } = req.body
+
+    db.run("UPDATE ejercicios SET completado = ? WHERE id = ?", [completado, id])
+    guardarDB()
+
+    const resultado = db.exec(
+        "SELECT COUNT(*) FROM ejercicios WHERE id_entrenamiento = ? AND completado = 0",
+        [idEntrenamiento]
+    )
+
+    const pendientes = resultado[0].values[0][0]
+
+    if(pendientes === 0) {
+        db.run("UPDATE entrenamientos SET estado = 'COMPLETADO' WHERE id = ?", [idEntrenamiento])
+        guardarDB()
+        res.json({ completado: true })
+    } else {
+        res.json({ completado: false })
+    }
+})
 
     app.listen(PORT, () => {
         console.log("Servidor corriendo en http://localhost:3000")

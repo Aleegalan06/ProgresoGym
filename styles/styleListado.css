@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #0f0f0f;
+  font-family: 'Inter', sans-serif;
+  padding: 2rem 1rem;
+}
+
+h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.4rem;
+  letter-spacing: 0.08em;
+  color: #e8ff47;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+#contenedorEntrenamientos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+#contenedorEntrenamientos div {
+  background-color: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+#contenedorEntrenamientos div:hover {
+  border-color: #e8ff47;
+  background-color: #1f1f1f;
+}
+
+#contenedorEntrenamientos p {
+  font-size: 0.95rem;
+  color: #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.estado-pendiente {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #888;
+  background-color: #2a2a2a;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+}
+
+.estado-completado {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #0f0f0f;
+  background-color: #e8ff47;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+}
+
+#contenedorEntrenamientos > p {
+  color: #555;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 2rem;
+  }
+}
