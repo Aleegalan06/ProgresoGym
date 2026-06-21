@@ -171,6 +171,35 @@ async function iniciarServidor() {
         }
     })
 
+    app.get("/ejercicios-unicos/:nombre", async (req, res) => {
+        const nombre = req.params.nombre
+
+        const [ejercicios] = await db.query(
+            `SELECT DISTINCT ej.nombre FROM ejercicios ej
+             JOIN entrenamientos e ON ej.id_entrenamiento = e.id
+             JOIN usuarios u ON e.id_usuario = u.id
+             WHERE u.nombre = ?`,
+            [nombre]
+        )
+
+        res.json(ejercicios)
+    })
+
+app.get("/progreso/:nombre/:ejercicio", async (req, res) => {
+    const { nombre, ejercicio } = req.params
+
+    const [historial] = await db.query(
+        `SELECT e.fecha, ej.peso, ej.repeticiones FROM ejercicios ej
+         JOIN entrenamientos e ON ej.id_entrenamiento = e.id
+         JOIN usuarios u ON e.id_usuario = u.id
+         WHERE u.nombre = ? AND ej.nombre = ?
+         ORDER BY e.fecha ASC`,
+        [nombre, ejercicio]
+    )
+
+    res.json(historial)
+})
+
     app.listen(PORT, () => {
         console.log("Servidor corriendo en http://localhost:3000")
     })

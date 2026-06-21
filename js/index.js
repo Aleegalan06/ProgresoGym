@@ -3,6 +3,7 @@ const nombreUsuario = document.getElementById("nombreUsuario")
 const fecha = document.getElementById("fecha")
 fecha.value = new Date().toISOString().split("T")[0]
 const formularioIndex = document.getElementById("formularioIndex")
+const verProgreso = document.getElementById("verProgreso")
 formularioIndex.addEventListener("submit", function(event){
     event.preventDefault()
     //Recoge el valor del nombredeusuario que los pasa a minusculaTodos
@@ -35,8 +36,10 @@ const verListado = document.getElementById("verListado")
 nombreUsuario.addEventListener("input", function(){
     if(nombreUsuario.value.trim() != ""){
         verListado.disabled = false
+        verProgreso.disabled = false
     } else {
         verListado.disabled = true
+        verProgreso.disabled = true
     }
 })
 
@@ -44,4 +47,9 @@ verListado.addEventListener("click", function(){
     const nombre = nombreUsuario.value.toLowerCase().trim().replace(/\s+/g, "")
     localStorage.setItem("usuario", nombre)
     window.location.href = "../html/listado.html"
+})
+verProgreso.addEventListener("click", function(){
+    const nombre = nombreUsuario.value.toLowerCase().trim().replace(/\s+/g, "")
+    localStorage.setItem("usuario", nombre)
+    window.location.href = "../html/progreso.html"
 })
