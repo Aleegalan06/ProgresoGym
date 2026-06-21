@@ -53,6 +53,10 @@ function cargarGrafica(nombreEjercicio) {
                     }]
                 },
                 options: {
+                    interaction: {
+                        mode: "nearest",
+                        intersect: true
+                    },
                     scales: {
                         y: {
                             ticks: { color: "#aaa" },
