@@ -1,6 +1,7 @@
 const usuario = localStorage.getItem("usuario")
 const selector = document.getElementById("selectorEjercicio")
 const canvas = document.getElementById("graficaProgreso")
+const infoDiv = document.getElementById("infoEjercicio")
 
 let grafica = null
 
@@ -37,6 +38,8 @@ function cargarGrafica(nombreEjercicio) {
                 grafica.destroy()
             }
 
+            infoDiv.style.display = "none"
+
             grafica = new Chart(canvas, {
                 type: "line",
                 data: {
@@ -72,19 +75,20 @@ function cargarGrafica(nombreEjercicio) {
                             labels: { color: "#f0f0f0" }
                         },
                         tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const index = context.dataIndex
-                                    const repeticiones = historial[index].repeticiones
-                                    return [
-                                        "Peso: " + context.raw + "kg",
-                                        "Repeticiones: " + repeticiones
-                                    ]
-                                }
-                            }
+                            enabled: false
                         }
                     }
                 }
             })
+
+            canvas.onclick = function(event) {
+                const puntos = grafica.getElementsAtEventForMode(event, "nearest", { intersect: false }, true)
+                console.log(puntos)
+                if(puntos.length > 0) {
+                    const index = puntos[0].index
+                    infoDiv.innerHTML = `Peso: ${historial[index].peso}kg — Repeticiones: ${historial[index].repeticiones}`
+                    infoDiv.style.display = "block"
+                }
+            }
         })
 }
