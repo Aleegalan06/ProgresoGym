@@ -1,12 +1,11 @@
+require("dotenv").config()
+const mysql = require("mysql2/promise")
 const express = require("express")
 const path = require("path")
-const fs = require("fs")
-const initSqlJs = require("sql.js")
 const XLSX = require("xlsx")
 
 const app = express()
 const PORT = 3000
-const DB_PATH = path.join(__dirname, "progresogym.db")
 
 app.use(express.static("."))
 app.use(express.json())
@@ -16,191 +15,165 @@ app.get("/", (req, res) => {
 })
 
 async function iniciarServidor() {
-    const SQL = await initSqlJs()
+    const db = await mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        port: process.env.DB_PORT
+    })
 
-    let db
-    if (fs.existsSync(DB_PATH)) {
-        const fileBuffer = fs.readFileSync(DB_PATH)
-        db = new SQL.Database(fileBuffer)
-    } else {
-        db = new SQL.Database()
-    }
-
-    function guardarDB() {
-        const data = db.export()
-        fs.writeFileSync(DB_PATH, Buffer.from(data))
-    }
-
-    db.run(`
+    await db.query(`
         CREATE TABLE IF NOT EXISTS usuarios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL UNIQUE
-        );
-        CREATE TABLE IF NOT EXISTS entrenamientos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            fecha TEXT NOT NULL,
-            estado TEXT DEFAULT 'PENDIENTE',
-            id_usuario INTEGER NOT NULL,
-            FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
-        );
-
-        CREATE TABLE IF NOT EXISTS ejercicios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
-            peso TEXT,
-            series INTEGER,
-            repeticiones INTEGER,
-            completado INTEGER DEFAULT 0,
-            id_entrenamiento INTEGER NOT NULL,
-            FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id)
-        );
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            nombre VARCHAR(255) NOT NULL UNIQUE
+        )
     `)
 
-    guardarDB()
-    
-    app.post("/usuario", (req, res) => {
+    await db.query(`
+        CREATE TABLE IF NOT EXISTS entrenamientos (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            fecha VARCHAR(20) NOT NULL,
+            estado VARCHAR(20) DEFAULT 'PENDIENTE',
+            id_usuario INT NOT NULL,
+            FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
+        )
+    `)
+
+    await db.query(`
+        CREATE TABLE IF NOT EXISTS ejercicios (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            nombre VARCHAR(255) NOT NULL,
+            peso VARCHAR(50),
+            series INT,
+            repeticiones INT,
+            completado TINYINT DEFAULT 0,
+            id_entrenamiento INT NOT NULL,
+            FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id)
+        )
+    `)
+
+    app.post("/usuario", async (req, res) => {
         const nombre = req.body.nombre.replace(/\s+/g, "")
         try {
-            db.run("INSERT OR IGNORE INTO usuarios (nombre) VALUES (?)", [nombre])
-            guardarDB()
+            await db.query("INSERT IGNORE INTO usuarios (nombre) VALUES (?)", [nombre])
             res.json({ mensaje: "Usuario guardado" })
         } catch (error) {
             res.json({ error: "Error al guardar el usuario" })
         }
     })
 
-    app.post("/entrenamiento", (req, res) => {
+    app.post("/entrenamiento", async (req, res) => {
         const { nombre, fecha } = req.body
-        const resultado = db.exec("SELECT id FROM usuarios WHERE nombre = ?", [nombre])
-        const idUsuario = resultado[0].values[0][0]
 
-        const stmt = db.prepare("INSERT INTO entrenamientos (fecha, id_usuario) VALUES (?, ?)")
-        stmt.run([fecha, idUsuario])
-        stmt.free()
-        guardarDB()
+        const [usuarios] = await db.query("SELECT id FROM usuarios WHERE nombre = ?", [nombre])
+        const idUsuario = usuarios[0].id
 
-        const resultId = db.exec("SELECT MAX(id) FROM entrenamientos")
-        const idEntrenamiento = resultId[0].values[0][0]
+        const [resultado] = await db.query(
+            "INSERT INTO entrenamientos (fecha, id_usuario) VALUES (?, ?)",
+            [fecha, idUsuario]
+        )
 
-        res.json({ idEntrenamiento: idEntrenamiento })
+        res.json({ idEntrenamiento: resultado.insertId })
     })
-    app.post("/ejercicio", (req, res) => {
-        const {nombre, peso, series, repeticiones, idEntrenamiento } = req.body
-        db.run("INSERT INTO ejercicios (nombre, peso, series, repeticiones, id_entrenamiento) VALUES (?, ?, ?, ?, ?)",
-            [nombre, peso, series, repeticiones, idEntrenamiento])
-            guardarDB()
+
+    app.post("/ejercicio", async (req, res) => {
+        const { nombre, peso, series, repeticiones, idEntrenamiento } = req.body
+
+        await db.query(
+            "INSERT INTO ejercicios (nombre, peso, series, repeticiones, id_entrenamiento) VALUES (?, ?, ?, ?, ?)",
+            [nombre, peso, series, repeticiones, idEntrenamiento]
+        )
+
         res.json({ mensaje: "Recibido" })
     })
-    app.get("/informe/:nombre", (req, res) => {
+
+    app.get("/informe/:nombre", async (req, res) => {
         const nombre = req.params.nombre
-        
-        const entrenamientos = db.exec(
+
+        const [entrenamientos] = await db.query(
             "SELECT id, fecha FROM entrenamientos WHERE id_usuario = (SELECT id FROM usuarios WHERE nombre = ?)",
             [nombre]
         )
-    
-        if(!entrenamientos.length || !entrenamientos[0].values.length) {
+
+        if(entrenamientos.length === 0) {
             return res.json({ error: "No hay entrenamientos" })
         }
-    
+
         const wb = XLSX.utils.book_new()
         const filas = []
-    
-        entrenamientos[0].values.forEach(entrenamiento => {
-            const idEntrenamiento = entrenamiento[0]
-            const fecha = entrenamiento[1]
-        
-            filas.push(["ENTRENAMIENTO : " + fecha, "", "", ""])
+
+        for (const entrenamiento of entrenamientos) {
+            filas.push(["ENTRENAMIENTO : " + entrenamiento.fecha, "", "", ""])
             filas.push(["Ejercicio", "Peso", "Series", "Repeticiones"])
-        
-            const ejercicios = db.exec(
+
+            const [ejercicios] = await db.query(
                 "SELECT nombre, peso, series, repeticiones FROM ejercicios WHERE id_entrenamiento = ?",
-                [idEntrenamiento]
+                [entrenamiento.id]
             )
-        
-            if(ejercicios.length && ejercicios[0].values.length) {
-                ejercicios[0].values.forEach(ej => {
-                    filas.push([ej[0], ej[1], ej[2], ej[3]])
-                })
-            }
-        
+
+            ejercicios.forEach(ej => {
+                filas.push([ej.nombre, ej.peso, ej.series, ej.repeticiones])
+            })
+
             filas.push(["", "", "", ""])
-        })
-    
+        }
+
         const ws = XLSX.utils.aoa_to_sheet(filas)
         XLSX.utils.book_append_sheet(wb, ws, "Informe")
-    
+
         const buffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" })
-    
+
         res.setHeader("Content-Disposition", "attachment; filename=informe.xlsx")
         res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         res.send(buffer)
     })
-    app.get("/listado/:nombre", (req, res) => {
+
+    app.get("/listado/:nombre", async (req, res) => {
         const nombre = req.params.nombre
-        const resultado = db.exec(
+
+        const [entrenamientos] = await db.query(
             "SELECT id, fecha, estado FROM entrenamientos WHERE id_usuario = (SELECT id FROM usuarios WHERE nombre = ?)",
             [nombre]
         )
-        if(!resultado.length || !resultado[0].values.length){
-            return res.json([])
-        }
-        const entrenamientos = resultado[0].values.map(e => ({
-            id: e[0],
-            fecha: e[1],
-            estado: e[2]
-        }))
+
         res.json(entrenamientos)
     })
-    app.get("/detalle/:id", (req, res) => {
+
+    app.get("/detalle/:id", async (req, res) => {
         const id = req.params.id
-        
-        const resultado = db.exec(
+
+        const [ejercicios] = await db.query(
             "SELECT id, nombre, peso, series, repeticiones, completado FROM ejercicios WHERE id_entrenamiento = ?",
             [id]
         )
-    
-        if(!resultado.length || !resultado[0].values.length) {
-            return res.json([])
-        }
-    
-        const ejercicios = resultado[0].values.map(e => ({
-            id: e[0],
-            nombre: e[1],
-            peso: e[2],
-            series: e[3],
-            repeticiones: e[4],
-            completado: e[5]
-        }))
-    
+
         res.json(ejercicios)
     })
-    app.post("/ejercicio/completado", (req, res) => {
-    const { id, completado, idEntrenamiento } = req.body
 
-    db.run("UPDATE ejercicios SET completado = ? WHERE id = ?", [completado, id])
-    guardarDB()
+    app.post("/ejercicio/completado", async (req, res) => {
+        const { id, completado, idEntrenamiento } = req.body
 
-    const resultado = db.exec(
-        "SELECT COUNT(*) FROM ejercicios WHERE id_entrenamiento = ? AND completado = 0",
-        [idEntrenamiento]
-    )
+        await db.query("UPDATE ejercicios SET completado = ? WHERE id = ?", [completado, id])
 
-    const pendientes = resultado[0].values[0][0]
+        const [resultado] = await db.query(
+            "SELECT COUNT(*) AS pendientes FROM ejercicios WHERE id_entrenamiento = ? AND completado = 0",
+            [idEntrenamiento]
+        )
 
-    if(pendientes === 0) {
-        db.run("UPDATE entrenamientos SET estado = 'COMPLETADO' WHERE id = ?", [idEntrenamiento])
-        guardarDB()
-        res.json({ completado: true })
-    } else {
-        res.json({ completado: false })
-    }
-})
+        const pendientes = resultado[0].pendientes
+
+        if(pendientes === 0) {
+            await db.query("UPDATE entrenamientos SET estado = 'COMPLETADO' WHERE id = ?", [idEntrenamiento])
+            res.json({ completado: true })
+        } else {
+            res.json({ completado: false })
+        }
+    })
 
     app.listen(PORT, () => {
         console.log("Servidor corriendo en http://localhost:3000")
     })
-    
 }
 
 iniciarServidor()
