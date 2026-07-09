@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -9,137 +9,182 @@
 body {
   min-height: 100vh;
   background-color: #0f0f0f;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-family: 'Inter', sans-serif;
   padding: 2rem 1rem;
-}
-
-form {
-  background-color: #1a1a1a;
-  border: 1px solid #2a2a2a;
-  border-radius: 16px;
-  padding: 2.5rem 2rem;
-  width: 100%;
-  max-width: 420px;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  align-items: center;
 }
 
-form::before {
-  content: "PROGRESOGYM";
-  display: block;
+/* TOPBAR */
+.topbar {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.topbar-logo {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 2.4rem;
+  font-size: 1.8rem;
   letter-spacing: 0.08em;
   color: #e8ff47;
-  text-align: center;
-  margin-bottom: 0.5rem;
 }
 
-input[type="text"],
-input[type="date"] {
+.topbar-usuario {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
+.topbar-usuario span {
+  font-size: 0.7rem;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.topbar-usuario strong {
+  font-size: 0.9rem;
+  color: #f0f0f0;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* FECHA CARD */
+.fecha-card {
   width: 100%;
-  padding: 0.85rem 1rem;
-  background-color: #111;
+  max-width: 480px;
+  background: linear-gradient(135deg, #1a1a1a, #222);
+  border: 1px solid #2a2a2a;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fecha-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fecha-card-info span {
+  font-size: 0.7rem;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.fecha-card-info strong {
+  font-size: 1.1rem;
+  color: #f0f0f0;
+  font-weight: 600;
+}
+
+input[type="date"] {
+  background: #111;
   border: 1px solid #333;
   border-radius: 8px;
   color: #f0f0f0;
   font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  font-weight: 500;
   outline: none;
-  transition: border-color 0.2s;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
   appearance: none;
   -webkit-appearance: none;
 }
 
-input[type="text"]::placeholder {
-  color: #555;
-}
-
-input[type="text"]:focus,
-input[type="date"]:focus {
-  border-color: #e8ff47;
-}
-
 input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.5);
+  filter: invert(0.4);
   cursor: pointer;
+}
+
+/* CTA PRINCIPAL */
+form {
+  width: 100%;
+  max-width: 480px;
+  display: contents;
+}
+
+input[type="submit"]#empezarEntrenamiento {
+  width: 100%;
+  max-width: 480px;
+  padding: 1.1rem;
+  background-color: #e8ff47;
+  color: #0f0f0f;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  margin-bottom: 1rem;
+}
+
+input[type="submit"]#empezarEntrenamiento:hover {
+  opacity: 0.88;
+}
+
+input[type="submit"]#empezarEntrenamiento:active {
+  transform: scale(0.98);
+}
+
+/* GRID DE ACCIONES */
+.grid-acciones {
+  width: 100%;
+  max-width: 480px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem;
 }
 
 input[type="button"] {
-  width: 100%;
-  padding: 0.9rem 1rem;
-  border: none;
-  border-radius: 8px;
+  background-color: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 1.25rem 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s, transform 0.1s;
   font-family: 'Inter', sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: opacity 0.2s, transform 0.1s;
+  text-transform: uppercase;
+  color: #777;
+  width: 100%;
+}
+
+input[type="button"]:hover {
+  border-color: #333;
+  background-color: #1f1f1f;
+  color: #ccc;
 }
 
 input[type="button"]:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
-#generarInforme {
-  background-color: #2a2a2a;
-  color: #aaa;
-  border: 1px solid #333;
+input[type="button"]:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
-#generarInforme:hover {
-  background-color: #333;
-  color: #f0f0f0;
-}
-
-#empezarEntrenamiento {
-  background-color: #e8ff47;
-  color: #0f0f0f;
-  margin-top: 0.25rem;
-}
-
-#empezarEntrenamiento:hover {
-  opacity: 0.88;
-}
-input[type="submit"] {
-  width: 100%;
-  padding: 0.9rem 1rem;
-  border: none;
-  border-radius: 8px;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: opacity 0.2s, transform 0.1s;
-  background-color: #e8ff47;
-  color: #0f0f0f;
-  margin-top: 0.25rem;
-}
-
-input[type="submit"]:active {
-  transform: scale(0.98);
-}
-
-input[type="submit"]:hover {
-  opacity: 0.88;
-}
-
-@media (max-width: 480px) {
-  form {
-    padding: 2rem 1.25rem;
+@media (max-width: 360px) {
+  .topbar-logo {
+    font-size: 1.5rem;
   }
 
-  form::before {
-    font-size: 2rem;
+  .grid-acciones {
+    grid-template-columns: 1fr 1fr;
   }
-}
-input:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
 }

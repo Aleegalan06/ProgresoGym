@@ -1,55 +1,45 @@
-const botonEmpezar = document.getElementById("empezarEntrenamiento")
-const nombreUsuario = document.getElementById("nombreUsuario")
+const usuario = localStorage.getItem("usuario")
+
+if(!usuario) {
+    window.location.href = "../html/login.html"
+}
+
 const fecha = document.getElementById("fecha")
-fecha.value = new Date().toISOString().split("T")[0]
 const formularioIndex = document.getElementById("formularioIndex")
+const verListado = document.getElementById("verListado")
 const verProgreso = document.getElementById("verProgreso")
-formularioIndex.addEventListener("submit", function(event){
+const botonInforme = document.getElementById("generarInforme")
+
+document.getElementById("nombreMostrado").textContent = usuario
+document.getElementById("fechaMostrada").textContent = new Date().toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })
+
+fecha.value = new Date().toISOString().split("T")[0]
+
+formularioIndex.addEventListener("submit", function(event) {
     event.preventDefault()
-    //Recoge el valor del nombredeusuario que los pasa a minusculaTodos
-    const valorNombre = nombreUsuario.value.toLowerCase().trim()
-    //Recoge el valor de la fecha de hoy
     const valorFecha = fecha.value
-    //Envio de datos
-    fetch("/usuario", {
+
+    fetch("/entrenamiento", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre: valorNombre })
+        body: JSON.stringify({ nombre: usuario, fecha: valorFecha })
     })
     .then(res => res.json())
     .then(data => {
-        localStorage.setItem("usuario", valorNombre)
         localStorage.setItem("fecha", valorFecha)
+        localStorage.setItem("idEntrenamiento", data.idEntrenamiento)
         window.location.href = "../html/entrenamiento.html"
     })
-    //Y redirige a entrenamiento.html
 })
-const botonInforme = document.getElementById("generarInforme")
 
 botonInforme.addEventListener("click", function() {
-    const nombre = document.getElementById("nombreUsuario").value.toLowerCase().trim().replace(/\s+/g, "")
-    window.location.href = "/informe/" + nombre
-})
-//Listado de entrenamientos
-const verListado = document.getElementById("verListado")
-
-nombreUsuario.addEventListener("input", function(){
-    if(nombreUsuario.value.trim() != ""){
-        verListado.disabled = false
-        verProgreso.disabled = false
-    } else {
-        verListado.disabled = true
-        verProgreso.disabled = true
-    }
+    window.location.href = "/informe/" + usuario
 })
 
-verListado.addEventListener("click", function(){
-    const nombre = nombreUsuario.value.toLowerCase().trim().replace(/\s+/g, "")
-    localStorage.setItem("usuario", nombre)
+verListado.addEventListener("click", function() {
     window.location.href = "../html/listado.html"
 })
-verProgreso.addEventListener("click", function(){
-    const nombre = nombreUsuario.value.toLowerCase().trim().replace(/\s+/g, "")
-    localStorage.setItem("usuario", nombre)
+
+verProgreso.addEventListener("click", function() {
     window.location.href = "../html/progreso.html"
 })

@@ -7,14 +7,32 @@
     <link rel="stylesheet" href="../styles/styleIndex.css">
 </head>
 <body>
+    <div class="topbar">
+        <span class="topbar-logo">PROGRESOGYM</span>
+        <div class="topbar-usuario">
+            <span>Bienvenido</span>
+            <strong id="nombreMostrado"></strong>
+        </div>
+    </div>
+
+    <div class="fecha-card">
+        <div class="fecha-card-info">
+            <span>Sesión de hoy</span>
+            <strong id="fechaMostrada"></strong>
+        </div>
+        <input type="date" name="fecha" id="fecha">
+    </div>
+
     <form action="#" method="get" id="formularioIndex">
-        <input type="text" id="nombreUsuario" name="nombreUsuario" placeholder="Nombre del Usuario" required> <br>
-        <input type="date" name="fecha" id="fecha"><br>
-        <input type="button" value="GENERAR INFORME" id="generarInforme" name="generarInforme"><br>
-        <input type="button" value="VER PROGRESO" id="verProgreso" name="verProgreso" disabled> <br>
-        <input type="submit" value="CREAR ENTRENAMIENTO" id="empezarEntrenamiento" name="empezarEntrenamiento">
-        <input type="button" value="VER LISTADO DE ENTRENAMIENTOS" id="verListado" name="verListado" disabled>
+        <input type="submit" value="＋ CREAR ENTRENAMIENTO" id="empezarEntrenamiento" name="empezarEntrenamiento">
     </form>
+
+    <div class="grid-acciones">
+        <input type="button" value="📊 INFORME" id="generarInforme" name="generarInforme">
+        <input type="button" value="📋 LISTADO" id="verListado" name="verListado">
+        <input type="button" value="📈 PROGRESO" id="verProgreso" name="verProgreso">
+    </div>
+
     <script src="../js/index.js"></script>
 </body>
 </html>

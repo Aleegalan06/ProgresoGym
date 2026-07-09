@@ -3,6 +3,7 @@ const { Pool } = require("pg")
 const express = require("express")
 const path = require("path")
 const XLSX = require("xlsx")
+const bcrypt = require("bcrypt")
 
 const app = express()
 const PORT = 3000
@@ -11,7 +12,7 @@ app.use(express.static("."))
 app.use(express.json())
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "html", "index.html"))
+    res.sendFile(path.join(__dirname, "html", "login.html"))
 })
 
 async function iniciarServidor() {
@@ -27,8 +28,13 @@ async function iniciarServidor() {
     await db.query(`
         CREATE TABLE IF NOT EXISTS usuarios (
             id SERIAL PRIMARY KEY,
-            nombre VARCHAR(255) NOT NULL UNIQUE
+            nombre VARCHAR(255) NOT NULL UNIQUE,
+            password VARCHAR(255)
         )
+    `)
+
+    await db.query(`
+        ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS password VARCHAR(255)
     `)
 
     await db.query(`
@@ -53,6 +59,54 @@ async function iniciarServidor() {
             FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id)
         )
     `)
+
+    app.post("/registro", async (req, res) => {
+        const { nombre, password } = req.body
+
+        if(!nombre || !password) {
+            return res.status(400).json({ error: "Nombre y contraseña son obligatorios" })
+        }
+
+        const nombreLimpio = nombre.replace(/\s+/g, "").toLowerCase()
+        const hash = await bcrypt.hash(password, 10)
+
+        try {
+            await db.query(
+                "INSERT INTO usuarios (nombre, password) VALUES ($1, $2)",
+                [nombreLimpio, hash]
+            )
+            res.json({ mensaje: "Usuario registrado" })
+        } catch (error) {
+            res.status(400).json({ error: "El usuario ya existe" })
+        }
+    })
+
+    app.post("/login", async (req, res) => {
+        const { nombre, password } = req.body
+
+        if(!nombre || !password) {
+            return res.status(400).json({ error: "Nombre y contraseña son obligatorios" })
+        }
+
+        const nombreLimpio = nombre.replace(/\s+/g, "").toLowerCase()
+
+        const { rows: usuarios } = await db.query(
+            "SELECT id, password FROM usuarios WHERE nombre = $1",
+            [nombreLimpio]
+        )
+
+        if(usuarios.length === 0) {
+            return res.status(401).json({ error: "Usuario no encontrado" })
+        }
+
+        const passwordCorrecta = await bcrypt.compare(password, usuarios[0].password)
+
+        if(!passwordCorrecta) {
+            return res.status(401).json({ error: "Contraseña incorrecta" })
+        }
+
+        res.json({ mensaje: "Login correcto", nombre: nombreLimpio })
+    })
 
     app.post("/usuario", async (req, res) => {
         const nombre = req.body.nombre.replace(/\s+/g, "")
