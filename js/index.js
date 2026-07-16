@@ -43,3 +43,7 @@ verListado.addEventListener("click", function() {
 verProgreso.addEventListener("click", function() {
     window.location.href = "../html/progreso.html"
 })
+document.getElementById("cerrarSesion").addEventListener("click", function() {
+    localStorage.clear()
+    window.location.href = "../html/login.html"
+})

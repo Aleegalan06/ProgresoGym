@@ -25,6 +25,22 @@ body {
   justify-content: space-between;
   margin-bottom: 2rem;
 }
+#cerrarSesion {
+    background: transparent;
+    border: none;
+    color: #555;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 0;
+    width: auto;
+}
+
+#cerrarSesion:hover {
+    color: #ff4747;
+}
 
 .topbar-logo {
   font-family: 'Bebas Neue', sans-serif;
