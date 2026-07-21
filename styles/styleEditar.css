@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #0f0f0f;
+  font-family: 'Inter', sans-serif;
+  padding: 2rem 1rem;
+}
+
+h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.4rem;
+  letter-spacing: 0.08em;
+  color: #e8ff47;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+#contenedorEditar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.ejercicio-editar {
+  background-color: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ejercicio-editar input[type="text"],
+.ejercicio-editar input[type="number"] {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  background-color: #111;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: #f0f0f0;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.ejercicio-editar input[type="text"]:focus,
+.ejercicio-editar input[type="number"]:focus {
+  border-color: #e8ff47;
+}
+
+.ejercicio-acciones {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.btn-guardar-ejercicio {
+  padding: 0.6rem 1rem;
+  background-color: #e8ff47;
+  color: #0f0f0f;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-guardar-ejercicio:hover {
+  opacity: 0.88;
+}
+
+.btn-eliminar-ejercicio {
+  padding: 0.6rem 1rem;
+  background-color: transparent;
+  color: #ff4747;
+  border: 1px solid #ff474733;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-eliminar-ejercicio:hover {
+  background-color: #ff47471a;
+}
+
+.btn-volver {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  margin: 1rem auto 0;
+  padding: 0.9rem;
+  background-color: #2a2a2a;
+  color: #aaa;
+  border: 1px solid #333;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  text-align: center;
+}
+
+.btn-volver:hover {
+  background-color: #333;
+  color: #f0f0f0;
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 2rem;
+  }
+}

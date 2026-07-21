@@ -143,6 +143,26 @@ async function iniciarServidor() {
         res.json({ mensaje: "Recibido" })
     })
 
+    app.put("/ejercicio/:id", async (req, res) => {
+        const id = req.params.id
+        const { nombre, peso, series, repeticiones } = req.body
+
+        await db.query(
+            "UPDATE ejercicios SET nombre = $1, peso = $2, series = $3, repeticiones = $4 WHERE id = $5",
+            [nombre, peso, series, repeticiones, id]
+        )
+
+        res.json({ mensaje: "Ejercicio actualizado" })
+    })
+
+    app.delete("/ejercicio/:id", async (req, res) => {
+        const id = req.params.id
+
+        await db.query("DELETE FROM ejercicios WHERE id = $1", [id])
+
+        res.json({ mensaje: "Ejercicio eliminado" })
+    })
+
     app.get("/informe/:nombre", async (req, res) => {
         const nombre = req.params.nombre
 
@@ -253,6 +273,15 @@ async function iniciarServidor() {
         )
 
         res.json(historial)
+    })
+
+    app.delete("/entrenamiento/:id", async (req, res) => {
+    const id = req.params.id
+
+    await db.query("DELETE FROM ejercicios WHERE id_entrenamiento = $1", [id])
+    await db.query("DELETE FROM entrenamientos WHERE id = $1", [id])
+
+    res.json({ mensaje: "Entrenamiento eliminado" })
     })
 
     app.listen(PORT, () => {
